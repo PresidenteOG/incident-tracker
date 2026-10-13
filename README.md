@@ -19,7 +19,8 @@ offline with nothing to configure — the database is created and filled with de
 time the app starts.
 
 **Live:** https://incident-tracker-6sbn.onrender.com — log in with `admin` / `admin`. It's a
-free instance, so the first request after a quiet spell takes ~30 s to wake.
+free instance that a scheduled ping keeps awake, so it normally answers straight away. If
+GitHub runs the ping late, the first request can take about two minutes.
 
 ## Start here
 
