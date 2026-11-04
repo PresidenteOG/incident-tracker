@@ -31,6 +31,12 @@ class IncidenciaDAOTest {
     }
 
     @Test
+    void theStatusIdsUsedByTheServiceMatchTheSeed() {
+        assertThat(estadoDAO.findById(Estado.OPEN_ID)).get().extracting(Estado::getNombre).isEqualTo("ABIERTO");
+        assertThat(estadoDAO.findById(Estado.CLOSED_ID)).get().extracting(Estado::getNombre).isEqualTo("CERRADO");
+    }
+
+    @Test
     void everySeededIncidentResolvesItsStatus() {
         assertThat(incidenciaDAO.findAll())
                 .allSatisfy(i -> assertThat(i.getEstado()).isNotNull());
@@ -38,7 +44,7 @@ class IncidenciaDAOTest {
 
     @Test
     void aSavedIncidentComesBackWithAGeneratedIdAndItsStatus() {
-        Estado abierto = estadoDAO.findById(1L).orElseThrow();
+        Estado abierto = estadoDAO.findById(Estado.OPEN_ID).orElseThrow();
         Incidencia i = new Incidencia();
         i.setTitol("Disco lleno en el nodo de logs");
         i.setLabor("Infra");

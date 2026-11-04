@@ -1,6 +1,7 @@
 -- Demo data, reloaded on every start (the schema is create-drop).
 -- Dates are relative to "now" so the list always looks current.
 
+-- Ids 1 and 3 are referenced from Java as Estado.OPEN_ID and Estado.CLOSED_ID; keep them in step.
 INSERT INTO estado (id, nombre) VALUES (1, 'ABIERTO'), (2, 'EN CURSO'), (3, 'CERRADO');
 
 INSERT INTO incidencia (id, labor, titol, descripcion, data_obertura, data_tancament, temps_resolucio, prioritat, estado_id) VALUES

@@ -35,9 +35,9 @@ public class IncidenciaServiceImpl implements IncidenciaService {
             // Nueva incidencia
             incidencia.setData_obertura(LocalDateTime.now());
 
-            // Si no viene estado del formulario, ponemos por defecto ABIERTO (id = 1)
+            // Si no viene estado del formulario, ponemos por defecto ABIERTO
             if (incidencia.getEstado() == null || incidencia.getEstado().getId() == null) {
-                Estado estadoAbierto = estadoDAO.findById(1L).orElse(null);
+                Estado estadoAbierto = estadoDAO.findById(Estado.OPEN_ID).orElse(null);
                 incidencia.setEstado(estadoAbierto);
             }
 
@@ -53,9 +53,7 @@ public class IncidenciaServiceImpl implements IncidenciaService {
         }
 
         // Si el estado es CERRADO, calculamos tiempos
-        if (incidencia.getEstado() != null &&
-                incidencia.getEstado().getId() != null &&
-                incidencia.getEstado().getId().equals(3L)) {
+        if (isClosed(incidencia.getEstado())) {
 
             incidencia.setData_tancament(LocalDateTime.now());
 
@@ -74,6 +72,10 @@ public class IncidenciaServiceImpl implements IncidenciaService {
         }
 
         return incidenciaDAO.save(incidencia);
+    }
+
+    private static boolean isClosed(Estado estado) {
+        return estado != null && estado.getId() != null && estado.getId() == Estado.CLOSED_ID;
     }
 
     @Override

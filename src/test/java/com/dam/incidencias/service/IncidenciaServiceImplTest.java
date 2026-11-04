@@ -43,9 +43,9 @@ class IncidenciaServiceImplTest {
         return e;
     }
 
-    private static final Estado ABIERTO = estado(1L, "ABIERTO");
+    private static final Estado ABIERTO = estado(Estado.OPEN_ID, "ABIERTO");
     private static final Estado EN_CURSO = estado(2L, "EN CURSO");
-    private static final Estado CERRADO = estado(3L, "CERRADO");
+    private static final Estado CERRADO = estado(Estado.CLOSED_ID, "CERRADO");
 
     // --- reads -------------------------------------------------------------
 
@@ -97,13 +97,13 @@ class IncidenciaServiceImplTest {
     @Test
     void aNewIncidentWithNoStatusDefaultsToAbierto() {
         Incidencia fresh = new Incidencia();
-        when(estadoDAO.findById(1L)).thenReturn(Optional.of(ABIERTO));
+        when(estadoDAO.findById(Estado.OPEN_ID)).thenReturn(Optional.of(ABIERTO));
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(fresh);
 
         assertThat(saved.getEstado()).isSameAs(ABIERTO);
-        verify(estadoDAO).findById(1L);
+        verify(estadoDAO).findById(Estado.OPEN_ID);
     }
 
     @Test
