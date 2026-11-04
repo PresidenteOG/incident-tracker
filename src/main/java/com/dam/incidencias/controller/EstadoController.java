@@ -1,6 +1,5 @@
 package com.dam.incidencias.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +12,11 @@ import com.dam.incidencias.service.EstadoService;
 @Controller
 public class EstadoController {
 
-    @Autowired
-    private EstadoService estadoService;
+    private final EstadoService estadoService;
+
+    public EstadoController(EstadoService estadoService) {
+        this.estadoService = estadoService;
+    }
 
     // ---------- CREAR ----------
 
@@ -42,14 +44,8 @@ public class EstadoController {
 
     @GetMapping("/Estado-edit/{id}")
     public String showEditEstadoForm(@PathVariable Long id, Model model) {
-        Estado estado = estadoService.getEstadoById(id);
-
-        if (estado != null) {
-            model.addAttribute("estado", estado);
-            return "Estado-edit";
-        } else {
-            return "redirect:/Estado-list";
-        }
+        model.addAttribute("estado", estadoService.getEstadoById(id));
+        return "Estado-edit";
     }
 
     @PostMapping("/Estado-update")

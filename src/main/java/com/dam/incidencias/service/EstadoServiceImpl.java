@@ -2,17 +2,20 @@ package com.dam.incidencias.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dam.incidencias.dao.EstadoDAO;
 import com.dam.incidencias.domain.Estado;
+import com.dam.incidencias.exception.EstadoNotFoundException;
 
 @Service
 public class EstadoServiceImpl implements EstadoService {
 
-    @Autowired
-    private EstadoDAO estadoDAO;
+    private final EstadoDAO estadoDAO;
+
+    public EstadoServiceImpl(EstadoDAO estadoDAO) {
+        this.estadoDAO = estadoDAO;
+    }
 
     @Override
     public List<Estado> getAllEstados() {
@@ -21,7 +24,7 @@ public class EstadoServiceImpl implements EstadoService {
 
     @Override
     public Estado getEstadoById(Long id) {
-        return estadoDAO.findById(id).orElse(null);
+        return estadoDAO.findById(id).orElseThrow(() -> new EstadoNotFoundException(id));
     }
 
     @Override
@@ -31,6 +34,9 @@ public class EstadoServiceImpl implements EstadoService {
 
     @Override
     public void deleteEstado(Long id) {
+        if (!estadoDAO.existsById(id)) {
+            throw new EstadoNotFoundException(id);
+        }
         estadoDAO.deleteById(id);
     }
 }

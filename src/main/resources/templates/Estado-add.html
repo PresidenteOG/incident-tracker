@@ -111,8 +111,8 @@
     <h2>Crear nuevo estado</h2>
 
     <form th:object="${estado}" th:action="@{/Estado}" method="post">
-      <label for="nombre">Nombre del estado:</label>
-      <input type="text" id="nombre" th:field="*{nombre}" required />
+      <label for="name">Nombre del estado:</label>
+      <input type="text" id="name" th:field="*{name}" required />
 
       <button type="submit">Guardar estado</button>
     </form>
