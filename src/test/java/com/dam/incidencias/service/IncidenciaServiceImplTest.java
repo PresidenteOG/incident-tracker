@@ -178,6 +178,24 @@ class IncidenciaServiceImplTest {
     }
 
     @Test
+    void updatingAnIncidentPreservesTheCategory() {
+        Incidencia original = new Incidencia();
+        original.setId(10L);
+        original.setCategory("HARDWARE");
+
+        Incidencia edited = new Incidencia();
+        edited.setId(10L);
+        edited.setStatus(EN_CURSO);
+
+        when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
+        when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Incidencia saved = service.saveIncidencia(edited);
+
+        assertThat(saved.getCategory()).isEqualTo("HARDWARE");
+    }
+
+    @Test
     void updatingAnIncidentThatNoLongerExistsThrows() {
         Incidencia edited = new Incidencia();
         edited.setId(404L);
