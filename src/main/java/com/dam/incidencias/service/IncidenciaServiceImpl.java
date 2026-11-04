@@ -10,9 +10,15 @@ import com.dam.incidencias.dao.EstadoDAO;
 import com.dam.incidencias.dao.IncidenciaDAO;
 import com.dam.incidencias.domain.Estado;
 import com.dam.incidencias.domain.Incidencia;
+import com.dam.incidencias.exception.EstadoNotFoundException;
+import com.dam.incidencias.exception.IncidenciaNotFoundException;
 
 @Service
 public class IncidenciaServiceImpl implements IncidenciaService {
+
+    // Demo credentials — there is no user table, this is the only account.
+    private static final String DEMO_USER = "admin";
+    private static final String DEMO_PASSWORD = "admin";
 
     private final IncidenciaDAO incidenciaDAO;
     private final EstadoDAO estadoDAO;
@@ -29,39 +35,25 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
     @Override
     public Incidencia saveIncidencia(Incidencia incidencia) {
-
-        boolean esNueva = (incidencia.getId() == null);
-
-        if (esNueva) {
-            // Nueva incidencia
+        if (incidencia.getId() == null) {
             incidencia.setOpenedAt(LocalDateTime.now());
 
-            // Si no viene estado del formulario, ponemos por defecto ABIERTO
+            // No status from the form: a new incident starts open.
             if (incidencia.getStatus() == null || incidencia.getStatus().getId() == null) {
-                Estado estadoAbierto = estadoDAO.findById(Estado.OPEN_ID).orElse(null);
-                incidencia.setStatus(estadoAbierto);
+                incidencia.setStatus(estadoDAO.findById(Estado.OPEN_ID)
+                        .orElseThrow(() -> new EstadoNotFoundException(Estado.OPEN_ID)));
             }
-
         } else {
-            // UPDATE → recuperamos la original para no perder la fecha de apertura
-            Incidencia original = incidenciaDAO.findById(incidencia.getId()).orElse(null);
-
-            if (original != null) {
-                incidencia.setOpenedAt(original.getOpenedAt());
-            }
-            // OJO: aquí NO tocamos incidencia.setStatus(...)
-            // porque ya viene del formulario con el nuevo estado
+            // The form does not carry the opening time, so take it from the stored row.
+            Incidencia original = findID(incidencia.getId());
+            incidencia.setOpenedAt(original.getOpenedAt());
         }
 
-        // Si el estado es CERRADO, calculamos tiempos
         if (isClosed(incidencia.getStatus())) {
-
             incidencia.setClosedAt(LocalDateTime.now());
-
             incidencia.setResolutionMinutes(
                     Duration.between(incidencia.getOpenedAt(), incidencia.getClosedAt()).toMinutes());
         } else {
-            // Si NO está cerrada, por si acaso dejamos estos a null
             incidencia.setClosedAt(null);
             incidencia.setResolutionMinutes(null);
         }
@@ -75,17 +67,16 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
     @Override
     public Incidencia findID(Long id) {
-        return incidenciaDAO.findById(id).orElse(null);
+        return incidenciaDAO.findById(id).orElseThrow(() -> new IncidenciaNotFoundException(id));
     }
 
     @Override
     public void deleteIncidencia(Long id) {
+        if (!incidenciaDAO.existsById(id)) {
+            throw new IncidenciaNotFoundException(id);
+        }
         incidenciaDAO.deleteById(id);
     }
-
-    // Demo credentials — there is no user table, this is the only account.
-    private static final String DEMO_USER = "admin";
-    private static final String DEMO_PASSWORD = "admin";
 
     @Override
     public boolean checkLogin(String name, String password) {

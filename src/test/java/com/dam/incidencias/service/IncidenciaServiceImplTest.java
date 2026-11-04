@@ -4,6 +4,8 @@ import com.dam.incidencias.dao.EstadoDAO;
 import com.dam.incidencias.dao.IncidenciaDAO;
 import com.dam.incidencias.domain.Estado;
 import com.dam.incidencias.domain.Incidencia;
+import com.dam.incidencias.exception.EstadoNotFoundException;
+import com.dam.incidencias.exception.IncidenciaNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -67,17 +70,30 @@ class IncidenciaServiceImplTest {
     }
 
     @Test
-    void findIdReturnsNullWhenAbsent() {
+    void findIdThrowsWhenAbsent() {
         when(incidenciaDAO.findById(99L)).thenReturn(Optional.empty());
 
-        assertThat(service.findID(99L)).isNull();
+        assertThatThrownBy(() -> service.findID(99L))
+                .isInstanceOf(IncidenciaNotFoundException.class)
+                .hasMessageContaining("99");
     }
 
     @Test
     void deleteIncidenciaDelegatesToDao() {
+        when(incidenciaDAO.existsById(4L)).thenReturn(true);
+
         service.deleteIncidencia(4L);
 
         verify(incidenciaDAO).deleteById(4L);
+    }
+
+    @Test
+    void deleteIncidenciaThrowsWhenAbsent() {
+        when(incidenciaDAO.existsById(4L)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.deleteIncidencia(4L))
+                .isInstanceOf(IncidenciaNotFoundException.class);
+        verify(incidenciaDAO, never()).deleteById(anyLong());
     }
 
     // --- create ----------------------------------------------------------
@@ -104,6 +120,15 @@ class IncidenciaServiceImplTest {
 
         assertThat(saved.getStatus()).isSameAs(ABIERTO);
         verify(estadoDAO).findById(Estado.OPEN_ID);
+    }
+
+    @Test
+    void aNewIncidentWithNoStatusFailsWhenTheOpenStatusIsMissing() {
+        when(estadoDAO.findById(Estado.OPEN_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.saveIncidencia(new Incidencia()))
+                .isInstanceOf(EstadoNotFoundException.class);
+        verify(incidenciaDAO, never()).save(any());
     }
 
     @Test
@@ -153,16 +178,15 @@ class IncidenciaServiceImplTest {
     }
 
     @Test
-    void updatingAnIncidentThatNoLongerExistsDoesNotThrow() {
+    void updatingAnIncidentThatNoLongerExistsThrows() {
         Incidencia edited = new Incidencia();
         edited.setId(404L);
         edited.setStatus(EN_CURSO);
         when(incidenciaDAO.findById(404L)).thenReturn(Optional.empty());
-        when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        Incidencia saved = service.saveIncidencia(edited);
-
-        assertThat(saved).isNotNull();
+        assertThatThrownBy(() -> service.saveIncidencia(edited))
+                .isInstanceOf(IncidenciaNotFoundException.class);
+        verify(incidenciaDAO, never()).save(any());
     }
 
     // --- closing math -----------------------------------------------------

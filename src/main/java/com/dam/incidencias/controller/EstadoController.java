@@ -44,14 +44,8 @@ public class EstadoController {
 
     @GetMapping("/Estado-edit/{id}")
     public String showEditEstadoForm(@PathVariable Long id, Model model) {
-        Estado estado = estadoService.getEstadoById(id);
-
-        if (estado != null) {
-            model.addAttribute("estado", estado);
-            return "Estado-edit";
-        } else {
-            return "redirect:/Estado-list";
-        }
+        model.addAttribute("estado", estadoService.getEstadoById(id));
+        return "Estado-edit";
     }
 
     @PostMapping("/Estado-update")
