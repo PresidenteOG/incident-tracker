@@ -44,9 +44,10 @@ public class IncidenciaServiceImpl implements IncidenciaService {
                         .orElseThrow(() -> new EstadoNotFoundException(Estado.OPEN_ID)));
             }
         } else {
-            // The form does not carry the opening time, so take it from the stored row.
+            // The form carries neither the opening time nor the category, so take them from the stored row.
             Incidencia original = findID(incidencia.getId());
             incidencia.setOpenedAt(original.getOpenedAt());
+            incidencia.setCategory(original.getCategory());
         }
 
         if (isClosed(incidencia.getStatus())) {
