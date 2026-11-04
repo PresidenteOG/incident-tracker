@@ -1,7 +1,6 @@
 package com.dam.incidencias.controller;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +17,13 @@ import java.util.List;
 @Controller
 public class IncidenciaController {
 
-    @Autowired
-    private IncidenciaService incidenciaService;
+    private final IncidenciaService incidenciaService;
+    private final EstadoService estadoService;
 
-    @Autowired
-    private EstadoService estadoService;
+    public IncidenciaController(IncidenciaService incidenciaService, EstadoService estadoService) {
+        this.incidenciaService = incidenciaService;
+        this.estadoService = estadoService;
+    }
 
     // Root -> the incident list (guarded by AuthInterceptor)
     @GetMapping("/")

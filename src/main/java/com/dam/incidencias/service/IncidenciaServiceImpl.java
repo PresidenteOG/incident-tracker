@@ -3,7 +3,6 @@ package com.dam.incidencias.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dam.incidencias.dao.EstadoDAO;
@@ -14,11 +13,13 @@ import com.dam.incidencias.domain.Incidencia;
 @Service
 public class IncidenciaServiceImpl implements IncidenciaService {
 
-    @Autowired
-    private IncidenciaDAO incidenciaDAO;
+    private final IncidenciaDAO incidenciaDAO;
+    private final EstadoDAO estadoDAO;
 
-    @Autowired
-    private EstadoDAO estadoDAO;
+    public IncidenciaServiceImpl(IncidenciaDAO incidenciaDAO, EstadoDAO estadoDAO) {
+        this.incidenciaDAO = incidenciaDAO;
+        this.estadoDAO = estadoDAO;
+    }
 
     @Override
     public List<Incidencia> getAllIssues() {

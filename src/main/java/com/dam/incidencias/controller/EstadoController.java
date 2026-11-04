@@ -1,6 +1,5 @@
 package com.dam.incidencias.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +12,11 @@ import com.dam.incidencias.service.EstadoService;
 @Controller
 public class EstadoController {
 
-    @Autowired
-    private EstadoService estadoService;
+    private final EstadoService estadoService;
+
+    public EstadoController(EstadoService estadoService) {
+        this.estadoService = estadoService;
+    }
 
     // ---------- CREAR ----------
 
