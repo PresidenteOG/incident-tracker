@@ -244,6 +244,27 @@ class IncidenciaServiceImplTest {
     }
 
     @Test
+    void editingAnAlreadyClosedIncidentKeepsItsClosingDateAndResolutionTime() {
+        LocalDateTime closed = LocalDateTime.now().minusDays(1);
+        Incidencia edited = new Incidencia();
+        edited.setId(10L);
+        edited.setStatus(CERRADO);
+        Incidencia original = new Incidencia();
+        original.setId(10L);
+        original.setOpenedAt(LocalDateTime.now().minusDays(2));
+        original.setStatus(CERRADO);
+        original.setClosedAt(closed);
+        original.setResolutionMinutes(720L);
+        when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
+        when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Incidencia saved = service.saveIncidencia(edited);
+
+        assertThat(saved.getClosedAt()).isEqualTo(closed);
+        assertThat(saved.getResolutionMinutes()).isEqualTo(720L);
+    }
+
+    @Test
     void reopeningAClosedIncidentClearsTheClosingDateAndResolutionTime() {
         Incidencia edited = new Incidencia();
         edited.setId(10L);
