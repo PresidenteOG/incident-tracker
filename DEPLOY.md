@@ -29,7 +29,7 @@ outside the container), and there are no file uploads.
 3. **Apply**. First build is ~3–4 min.
 4. The URL is `https://incident-tracker-XXXX.onrender.com`. Log in with `admin` / `admin`.
 
-Free instances sleep after 15 min idle; the next hit takes ~30 s to wake. Fine for a portfolio
+Free instances sleep after 15 min idle; the next hit can take over a minute to wake. Fine for a portfolio
 link — say so next to it.
 
 ## Railway / Fly (alternative)
