@@ -35,6 +35,8 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
     @Override
     public Incidencia saveIncidencia(Incidencia incidencia) {
+        boolean alreadyClosed = false;
+
         if (incidencia.getId() == null) {
             incidencia.setOpenedAt(LocalDateTime.now());
 
@@ -44,16 +46,22 @@ public class IncidenciaServiceImpl implements IncidenciaService {
                         .orElseThrow(() -> new EstadoNotFoundException(Estado.OPEN_ID)));
             }
         } else {
-            // The form carries neither the opening time nor the category, so take them from the stored row.
+            // The form carries neither the opening time, the category nor the closing data, so take them from the stored row.
             Incidencia original = findID(incidencia.getId());
             incidencia.setOpenedAt(original.getOpenedAt());
             incidencia.setCategory(original.getCategory());
+            incidencia.setClosedAt(original.getClosedAt());
+            incidencia.setResolutionMinutes(original.getResolutionMinutes());
+            alreadyClosed = original.getClosedAt() != null;
         }
 
         if (isClosed(incidencia.getStatus())) {
-            incidencia.setClosedAt(LocalDateTime.now());
-            incidencia.setResolutionMinutes(
-                    Duration.between(incidencia.getOpenedAt(), incidencia.getClosedAt()).toMinutes());
+            // Only stamp the closing when it happens now; editing a closed incident must not move it.
+            if (!alreadyClosed) {
+                incidencia.setClosedAt(LocalDateTime.now());
+                incidencia.setResolutionMinutes(
+                        Duration.between(incidencia.getOpenedAt(), incidencia.getClosedAt()).toMinutes());
+            }
         } else {
             incidencia.setClosedAt(null);
             incidencia.setResolutionMinutes(null);
