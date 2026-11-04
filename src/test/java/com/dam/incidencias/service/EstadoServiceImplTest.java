@@ -28,7 +28,7 @@ class EstadoServiceImplTest {
     private static Estado estado(long id, String nombre) {
         Estado e = new Estado();
         e.setId(id);
-        e.setNombre(nombre);
+        e.setName(nombre);
         return e;
     }
 

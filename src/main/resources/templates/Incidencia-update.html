@@ -95,24 +95,24 @@
     <form th:object="${incidencia}" th:action="@{/Incidencia}" method="post">
       <input type="hidden" th:field="*{id}" />
 
-      <label for="titol">Título:</label>
-      <input type="text" id="titol" th:field="*{titol}" required />
+      <label for="title">Título:</label>
+      <input type="text" id="title" th:field="*{title}" required />
 
-      <label for="descripcion">Descripción:</label>
-      <input type="text" id="descripcion" th:field="*{descripcion}" required />
+      <label for="description">Descripción:</label>
+      <input type="text" id="description" th:field="*{description}" required />
 
-      <label for="prioritat">Prioridad:</label>
-      <select id="prioritat" th:field="*{prioritat}">
+      <label for="priority">Prioridad:</label>
+      <select id="priority" th:field="*{priority}">
         <option value="BAIXA">BAIXA</option>
         <option value="MITJA">MITJA</option>
         <option value="ALTA">ALTA</option>
       </select>
 
-      <label for="estat">Estado:</label>
-      <select id="estat" th:field="*{estado.id}">
+      <label for="status">Estado:</label>
+      <select id="status" th:field="*{status.id}">
         <option th:each="e : ${estados}"
                 th:value="${e.id}"
-                th:text="${e.nombre}">
+                th:text="${e.name}">
         </option>
       </select>
 

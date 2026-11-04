@@ -33,12 +33,12 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
         if (esNueva) {
             // Nueva incidencia
-            incidencia.setData_obertura(LocalDateTime.now());
+            incidencia.setOpenedAt(LocalDateTime.now());
 
             // Si no viene estado del formulario, ponemos por defecto ABIERTO
-            if (incidencia.getEstado() == null || incidencia.getEstado().getId() == null) {
+            if (incidencia.getStatus() == null || incidencia.getStatus().getId() == null) {
                 Estado estadoAbierto = estadoDAO.findById(Estado.OPEN_ID).orElse(null);
-                incidencia.setEstado(estadoAbierto);
+                incidencia.setStatus(estadoAbierto);
             }
 
         } else {
@@ -46,29 +46,29 @@ public class IncidenciaServiceImpl implements IncidenciaService {
             Incidencia original = incidenciaDAO.findById(incidencia.getId()).orElse(null);
 
             if (original != null) {
-                incidencia.setData_obertura(original.getData_obertura());
+                incidencia.setOpenedAt(original.getOpenedAt());
             }
-            // OJO: aquí NO tocamos incidencia.setEstado(...)
+            // OJO: aquí NO tocamos incidencia.setStatus(...)
             // porque ya viene del formulario con el nuevo estado
         }
 
         // Si el estado es CERRADO, calculamos tiempos
-        if (isClosed(incidencia.getEstado())) {
+        if (isClosed(incidencia.getStatus())) {
 
-            incidencia.setData_tancament(LocalDateTime.now());
+            incidencia.setClosedAt(LocalDateTime.now());
 
             long minutosTotales = java.time.Duration
-                    .between(incidencia.getData_obertura(), incidencia.getData_tancament())
+                    .between(incidencia.getOpenedAt(), incidencia.getClosedAt())
                     .toMinutes();
 
             long horas = minutosTotales / 60;
             long minutos = minutosTotales % 60;
 
-            incidencia.setTemps_resolucio(horas + "h " + minutos + "m");
+            incidencia.setResolutionTime(horas + "h " + minutos + "m");
         } else {
             // Si NO está cerrada, por si acaso dejamos estos a null
-            incidencia.setData_tancament(null);
-            incidencia.setTemps_resolucio(null);
+            incidencia.setClosedAt(null);
+            incidencia.setResolutionTime(null);
         }
 
         return incidenciaDAO.save(incidencia);

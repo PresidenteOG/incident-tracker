@@ -119,13 +119,13 @@
 
     <tr th:each="incidencia : ${incidencias}">
       <td th:text="${incidencia.id}"></td>
-      <td th:text="${incidencia.titol}"></td>
-      <td th:text="${incidencia.descripcion}"></td>
-      <td th:text="${incidencia.data_obertura}"></td>
-      <td th:text="${incidencia.data_tancament}"></td>
-      <td th:text="${incidencia.temps_resolucio}"></td>
-      <td th:text="${incidencia.estado != null ? incidencia.estado.nombre : '—'}"></td>
-      <td th:text="${incidencia.prioritat}"></td>
+      <td th:text="${incidencia.title}"></td>
+      <td th:text="${incidencia.description}"></td>
+      <td th:text="${incidencia.openedAt}"></td>
+      <td th:text="${incidencia.closedAt}"></td>
+      <td th:text="${incidencia.resolutionTime}"></td>
+      <td th:text="${incidencia.status != null ? incidencia.status.name : '—'}"></td>
+      <td th:text="${incidencia.priority}"></td>
 
       <td>
         <a th:href="@{'/Incidencia/updateData/' + ${incidencia.id}}">Editar</a>

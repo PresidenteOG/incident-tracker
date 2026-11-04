@@ -16,6 +16,7 @@ public class Estado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Nombre del estado (ejemplo: ABIERTO, CERRADO, ON_GOING)
-    private String nombre;
+    // Status label, e.g. ABIERTO, EN CURSO, CERRADO
+    @Column(name = "nombre")
+    private String name;
 }

@@ -179,7 +179,7 @@
     <tbody>
       <tr th:each="estado : ${estados}">
         <td th:text="${estado.id}"></td>
-        <td th:text="${estado.nombre}"></td>
+        <td th:text="${estado.name}"></td>
         <td>
           <a class="table-btn edit" th:href="@{'/Estado-edit/' + ${estado.id}}">Editar</a>
           <a class="table-btn delete" th:href="@{'/Estado-delete/' + ${estado.id}}">Eliminar</a>

@@ -32,32 +32,32 @@ class IncidenciaDAOTest {
 
     @Test
     void theStatusIdsUsedByTheServiceMatchTheSeed() {
-        assertThat(estadoDAO.findById(Estado.OPEN_ID)).get().extracting(Estado::getNombre).isEqualTo("ABIERTO");
-        assertThat(estadoDAO.findById(Estado.CLOSED_ID)).get().extracting(Estado::getNombre).isEqualTo("CERRADO");
+        assertThat(estadoDAO.findById(Estado.OPEN_ID)).get().extracting(Estado::getName).isEqualTo("ABIERTO");
+        assertThat(estadoDAO.findById(Estado.CLOSED_ID)).get().extracting(Estado::getName).isEqualTo("CERRADO");
     }
 
     @Test
     void everySeededIncidentResolvesItsStatus() {
         assertThat(incidenciaDAO.findAll())
-                .allSatisfy(i -> assertThat(i.getEstado()).isNotNull());
+                .allSatisfy(i -> assertThat(i.getStatus()).isNotNull());
     }
 
     @Test
     void aSavedIncidentComesBackWithAGeneratedIdAndItsStatus() {
         Estado abierto = estadoDAO.findById(Estado.OPEN_ID).orElseThrow();
         Incidencia i = new Incidencia();
-        i.setTitol("Disco lleno en el nodo de logs");
-        i.setLabor("Infra");
-        i.setPrioritat("ALTA");
-        i.setData_obertura(LocalDateTime.now());
-        i.setEstado(abierto);
+        i.setTitle("Disco lleno en el nodo de logs");
+        i.setCategory("Infra");
+        i.setPriority("ALTA");
+        i.setOpenedAt(LocalDateTime.now());
+        i.setStatus(abierto);
 
         Incidencia saved = incidenciaDAO.save(i);
 
         assertThat(saved.getId()).isNotNull();
         Incidencia reloaded = incidenciaDAO.findById(saved.getId()).orElseThrow();
-        assertThat(reloaded.getTitol()).isEqualTo("Disco lleno en el nodo de logs");
-        assertThat(reloaded.getEstado().getNombre()).isEqualTo("ABIERTO");
+        assertThat(reloaded.getTitle()).isEqualTo("Disco lleno en el nodo de logs");
+        assertThat(reloaded.getStatus().getName()).isEqualTo("ABIERTO");
     }
 
     @Test

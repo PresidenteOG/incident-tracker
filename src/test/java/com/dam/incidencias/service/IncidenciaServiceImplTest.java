@@ -39,7 +39,7 @@ class IncidenciaServiceImplTest {
     private static Estado estado(long id, String nombre) {
         Estado e = new Estado();
         e.setId(id);
-        e.setNombre(nombre);
+        e.setName(nombre);
         return e;
     }
 
@@ -85,12 +85,12 @@ class IncidenciaServiceImplTest {
     @Test
     void savingANewIncidentStampsTheOpeningDate() {
         Incidencia fresh = new Incidencia();
-        fresh.setEstado(EN_CURSO);
+        fresh.setStatus(EN_CURSO);
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(fresh);
 
-        assertThat(saved.getData_obertura()).isCloseTo(LocalDateTime.now(),
+        assertThat(saved.getOpenedAt()).isCloseTo(LocalDateTime.now(),
                 within(5L, java.time.temporal.ChronoUnit.SECONDS));
     }
 
@@ -102,32 +102,32 @@ class IncidenciaServiceImplTest {
 
         Incidencia saved = service.saveIncidencia(fresh);
 
-        assertThat(saved.getEstado()).isSameAs(ABIERTO);
+        assertThat(saved.getStatus()).isSameAs(ABIERTO);
         verify(estadoDAO).findById(Estado.OPEN_ID);
     }
 
     @Test
     void aNewIncidentKeepsAStatusThatCameFromTheForm() {
         Incidencia fresh = new Incidencia();
-        fresh.setEstado(EN_CURSO);
+        fresh.setStatus(EN_CURSO);
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(fresh);
 
-        assertThat(saved.getEstado()).isSameAs(EN_CURSO);
+        assertThat(saved.getStatus()).isSameAs(EN_CURSO);
         verify(estadoDAO, never()).findById(anyLong());
     }
 
     @Test
     void anOpenIncidentHasNoClosingDateOrResolutionTime() {
         Incidencia fresh = new Incidencia();
-        fresh.setEstado(EN_CURSO);
+        fresh.setStatus(EN_CURSO);
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(fresh);
 
-        assertThat(saved.getData_tancament()).isNull();
-        assertThat(saved.getTemps_resolucio()).isNull();
+        assertThat(saved.getClosedAt()).isNull();
+        assertThat(saved.getResolutionTime()).isNull();
     }
 
     // --- update --------------------------------------------------------
@@ -137,26 +137,26 @@ class IncidenciaServiceImplTest {
         LocalDateTime opened = LocalDateTime.now().minusDays(3);
         Incidencia original = new Incidencia();
         original.setId(10L);
-        original.setData_obertura(opened);
+        original.setOpenedAt(opened);
 
         Incidencia edited = new Incidencia();
         edited.setId(10L);
-        edited.setEstado(EN_CURSO);
-        edited.setData_obertura(LocalDateTime.now()); // stale value from the form
+        edited.setStatus(EN_CURSO);
+        edited.setOpenedAt(LocalDateTime.now()); // stale value from the form
 
         when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(edited);
 
-        assertThat(saved.getData_obertura()).isEqualTo(opened);
+        assertThat(saved.getOpenedAt()).isEqualTo(opened);
     }
 
     @Test
     void updatingAnIncidentThatNoLongerExistsDoesNotThrow() {
         Incidencia edited = new Incidencia();
         edited.setId(404L);
-        edited.setEstado(EN_CURSO);
+        edited.setStatus(EN_CURSO);
         when(incidenciaDAO.findById(404L)).thenReturn(Optional.empty());
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -171,16 +171,16 @@ class IncidenciaServiceImplTest {
     void closingAnIncidentStampsTheClosingDate() {
         Incidencia edited = new Incidencia();
         edited.setId(10L);
-        edited.setEstado(CERRADO);
+        edited.setStatus(CERRADO);
         Incidencia original = new Incidencia();
         original.setId(10L);
-        original.setData_obertura(LocalDateTime.now().minusMinutes(90));
+        original.setOpenedAt(LocalDateTime.now().minusMinutes(90));
         when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(edited);
 
-        assertThat(saved.getData_tancament()).isCloseTo(LocalDateTime.now(),
+        assertThat(saved.getClosedAt()).isCloseTo(LocalDateTime.now(),
                 within(5L, java.time.temporal.ChronoUnit.SECONDS));
     }
 
@@ -188,35 +188,35 @@ class IncidenciaServiceImplTest {
     void closingAnIncidentRecordsHoursAndMinutesSinceItOpened() {
         Incidencia edited = new Incidencia();
         edited.setId(10L);
-        edited.setEstado(CERRADO);
+        edited.setStatus(CERRADO);
         Incidencia original = new Incidencia();
         original.setId(10L);
-        original.setData_obertura(LocalDateTime.now().minusMinutes(150));
+        original.setOpenedAt(LocalDateTime.now().minusMinutes(150));
         when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(edited);
 
-        assertThat(saved.getTemps_resolucio()).isEqualTo("2h 30m");
+        assertThat(saved.getResolutionTime()).isEqualTo("2h 30m");
     }
 
     @Test
     void reopeningAClosedIncidentClearsTheClosingDateAndResolutionTime() {
         Incidencia edited = new Incidencia();
         edited.setId(10L);
-        edited.setEstado(EN_CURSO);
-        edited.setData_tancament(LocalDateTime.now().minusDays(1));
-        edited.setTemps_resolucio("12h 0m");
+        edited.setStatus(EN_CURSO);
+        edited.setClosedAt(LocalDateTime.now().minusDays(1));
+        edited.setResolutionTime("12h 0m");
         Incidencia original = new Incidencia();
         original.setId(10L);
-        original.setData_obertura(LocalDateTime.now().minusDays(2));
+        original.setOpenedAt(LocalDateTime.now().minusDays(2));
         when(incidenciaDAO.findById(10L)).thenReturn(Optional.of(original));
         when(incidenciaDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Incidencia saved = service.saveIncidencia(edited);
 
-        assertThat(saved.getData_tancament()).isNull();
-        assertThat(saved.getTemps_resolucio()).isNull();
+        assertThat(saved.getClosedAt()).isNull();
+        assertThat(saved.getResolutionTime()).isNull();
     }
 
     // --- login ---------------------------------------------------------
