@@ -43,6 +43,14 @@ class IncidenciaDAOTest {
     }
 
     @Test
+    void seededClosedIncidentsStoreTheirResolutionInMinutes() {
+        Incidencia printer = incidenciaDAO.findById(3L).orElseThrow();
+
+        assertThat(printer.getResolutionMinutes()).isEqualTo(120L);
+        assertThat(printer.getResolutionTime()).isEqualTo("2h 0m");
+    }
+
+    @Test
     void aSavedIncidentComesBackWithAGeneratedIdAndItsStatus() {
         Estado abierto = estadoDAO.findById(Estado.OPEN_ID).orElseThrow();
         Incidencia i = new Incidencia();

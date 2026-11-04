@@ -1,5 +1,6 @@
 package com.dam.incidencias.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,18 +58,12 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
             incidencia.setClosedAt(LocalDateTime.now());
 
-            long minutosTotales = java.time.Duration
-                    .between(incidencia.getOpenedAt(), incidencia.getClosedAt())
-                    .toMinutes();
-
-            long horas = minutosTotales / 60;
-            long minutos = minutosTotales % 60;
-
-            incidencia.setResolutionTime(horas + "h " + minutos + "m");
+            incidencia.setResolutionMinutes(
+                    Duration.between(incidencia.getOpenedAt(), incidencia.getClosedAt()).toMinutes());
         } else {
             // Si NO está cerrada, por si acaso dejamos estos a null
             incidencia.setClosedAt(null);
-            incidencia.setResolutionTime(null);
+            incidencia.setResolutionMinutes(null);
         }
 
         return incidenciaDAO.save(incidencia);

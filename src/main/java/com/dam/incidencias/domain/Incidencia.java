@@ -37,7 +37,7 @@ public class Incidencia {
     private LocalDateTime closedAt;
 
     @Column(name = "temps_resolucio")
-    private String resolutionTime;
+    private Long resolutionMinutes;
 
     @Column(name = "prioritat")
     private String priority;
@@ -45,6 +45,14 @@ public class Incidencia {
     @ManyToOne
     @JoinColumn(name = "estado_id")
     private Estado status;
+
+    /** Resolution time for display, e.g. {@code "2h 30m"}; null while the incident is not closed. */
+    public String getResolutionTime() {
+        if (resolutionMinutes == null) {
+            return null;
+        }
+        return resolutionMinutes / 60 + "h " + resolutionMinutes % 60 + "m";
+    }
 }
 
 

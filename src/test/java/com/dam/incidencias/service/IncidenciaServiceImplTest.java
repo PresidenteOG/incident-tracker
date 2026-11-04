@@ -127,7 +127,7 @@ class IncidenciaServiceImplTest {
         Incidencia saved = service.saveIncidencia(fresh);
 
         assertThat(saved.getClosedAt()).isNull();
-        assertThat(saved.getResolutionTime()).isNull();
+        assertThat(saved.getResolutionMinutes()).isNull();
     }
 
     // --- update --------------------------------------------------------
@@ -185,7 +185,7 @@ class IncidenciaServiceImplTest {
     }
 
     @Test
-    void closingAnIncidentRecordsHoursAndMinutesSinceItOpened() {
+    void closingAnIncidentRecordsTheMinutesSinceItOpened() {
         Incidencia edited = new Incidencia();
         edited.setId(10L);
         edited.setStatus(CERRADO);
@@ -197,6 +197,7 @@ class IncidenciaServiceImplTest {
 
         Incidencia saved = service.saveIncidencia(edited);
 
+        assertThat(saved.getResolutionMinutes()).isEqualTo(150L);
         assertThat(saved.getResolutionTime()).isEqualTo("2h 30m");
     }
 
@@ -206,7 +207,7 @@ class IncidenciaServiceImplTest {
         edited.setId(10L);
         edited.setStatus(EN_CURSO);
         edited.setClosedAt(LocalDateTime.now().minusDays(1));
-        edited.setResolutionTime("12h 0m");
+        edited.setResolutionMinutes(720L);
         Incidencia original = new Incidencia();
         original.setId(10L);
         original.setOpenedAt(LocalDateTime.now().minusDays(2));
@@ -216,7 +217,7 @@ class IncidenciaServiceImplTest {
         Incidencia saved = service.saveIncidencia(edited);
 
         assertThat(saved.getClosedAt()).isNull();
-        assertThat(saved.getResolutionTime()).isNull();
+        assertThat(saved.getResolutionMinutes()).isNull();
     }
 
     // --- login ---------------------------------------------------------
